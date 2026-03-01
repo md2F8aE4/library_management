@@ -20,6 +20,8 @@ class Book(models.Model):
      invoice_id = fields.Many2one('account.move')
      delivery_count = fields.Integer(compute="_compute_counts", store=True)
      invoice_count = fields.Integer(compute="_compute_counts", store=True)
+
+     
      def _compute_counts(self):
       for record in self:
         record.delivery_count = 1 if record.delivery_id else 0
