@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+   <data>
+<record id="book_tree_view" model="ir.ui.view">
+    <field name="name">book.tree.view</field>
+    <field name="model">library.book</field>
+    <field name="arch" type="xml">
+
+        <tree>
+            <field name="name"/>
+            <field name="author"/>
+            <field name="product_id"/>
+            <field name="quantity"/>
+            <field name="price_unit"/>
+            <field name="state"/>
+        </tree>
+
+    </field>
+</record>
+    
+<record id="book_form_view" model="ir.ui.view">
+    <field name="name">book.form.view</field>
+    <field name="model">library.book</field>
+    <field name="arch" type="xml">
+
+        <form string="Book">
+         <header>
+
+         <button name="action_view_delivery"
+            type="object"
+            class="oe_stat_button"
+            icon="fa-truck">
+
+        <field name="delivery_count" widget="statinfo" string="Delivery"/>
+        </button>
+
+         <button name="action_view_invoice"
+            type="object"
+            class="oe_stat_button"
+            icon="fa-file-text">
+
+        <field name="invoice_count" widget="statinfo" string="Invoice"/>
+        </button>
+
+        </header>
+
+            <sheet>
+
+                <group string="Book Information">
+                    <field name="name"/>
+                    <field name="author"/>
+                    <field name="published_date"/>
+                    <field name="description"/>
+                    <field name="customr_id"/>
+                </group>
+
+                <group string="Product Information">
+                    <field name="product_id"/>
+                    <field name="quantity"/>
+                    <field name="price_unit" readonly="1"/>
+                </group>
+
+                <group string="Status">
+                    <field name="state"/>
+                     <field name="availability" readonly="1"/>
+                   
+                </group>
+
+              
+
+            </sheet>
+
+        </form>
+
+    </field>
+</record>
+
+<record id="book_action" model="ir.actions.act_window">
+    <field name="name">Book Action</field>
+    <field name="res_model">library.book</field>
+    <field name="view_mode">tree,form</field>
+</record>
+
+
+
+    <menuitem
+        id="book_menu_item"
+        name="Books"
+        parent="library_management_menu"
+        action="book_action"/>
+
+   
+   </data>
+   
+</odoo>
