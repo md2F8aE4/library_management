@@ -51,7 +51,7 @@
                     <field name="author"/>
                     <field name="published_date"/>
                     <field name="description"/>
-                    <field name="customr_id"/>
+                    <field name="customer_id"/>
                 </group>
 
                 <group string="Product Information">
@@ -74,13 +74,12 @@
 
     </field>
 </record>
-
 <record id="book_action" model="ir.actions.act_window">
-    <field name="name">Book Action</field>
-    <field name="res_model">library.book</field>
-    <field name="view_mode">tree,form</field>
-</record>
+        <field name="name">Books</field>
+        <field name="res_model">library.book</field>
+        <field name="view_mode">tree,form</field>
 
+    </record>
 
 
     <menuitem
@@ -89,7 +88,8 @@
         parent="library_management_menu"
         action="book_action"/>
 
-   
+
+ 
    </data>
    
 </odoo>
