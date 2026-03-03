@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-   <data>
+
+<data>
+
+<record id="book_search_view" model="ir.ui.view">
+    <field name="name">book.search.view</field>
+    <field name="model">library.book</field>
+    <field name="arch" type="xml">
+        <search>
+            <filter string="Published Date"
+                    name="published_date"
+                    domain="[('published_date','!=',False)]"/>
+
+            <filter string="Group By Author"
+                    name="group_by_author"
+                    context="{'group_by':'author'}"/>
+        </search>
+    </field>
+</record>
+
 <record id="book_tree_view" model="ir.ui.view">
     <field name="name">book.tree.view</field>
     <field name="model">library.book</field>
     <field name="arch" type="xml">
-
         <tree>
             <field name="name"/>
             <field name="author"/>
@@ -14,59 +31,90 @@
             <field name="price_unit"/>
             <field name="state"/>
         </tree>
-
     </field>
 </record>
-    
+
 <record id="book_form_view" model="ir.ui.view">
     <field name="name">book.form.view</field>
     <field name="model">library.book</field>
     <field name="arch" type="xml">
 
         <form string="Book">
-         <header>
 
-         <button name="action_view_delivery"
-            type="object"
-            class="oe_stat_button"
-            icon="fa-truck">
+            <header>
 
-        <field name="delivery_count" widget="statinfo" string="Delivery"/>
-        </button>
+                <field name="invoice_id" invisible="1"/>
+                <field name="delivery_id" invisible="1"/>
 
-         <button name="action_view_invoice"
-            type="object"
-            class="oe_stat_button"
-            icon="fa-file-text">
+                <button name="action_borrow"
+                        type="object"
+                        string="Borrow"
+                        class="oe_highlight"
+                        invisible="state != 'available'"/>
 
-        <field name="invoice_count" widget="statinfo" string="Invoice"/>
-        </button>
+                <button name="action_set_available"
+                        type="object"
+                        string="Set To Available"/>
 
-        </header>
+                <button name="action_set_borrowed"
+                        type="object"
+                        string="Set To Borrowed"
+                        invisible="1"/>
+
+                <button name="action_set_returned"
+                        type="object"
+                        string="Set To Returned"/>
+
+                <field name="state"
+                       widget="statusbar"
+                       statusbar_visible="available,borrowed,returned"/>
+
+                <button name="action_view_delivery"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-truck">
+
+                    <field name="delivery_count"
+                           widget="statinfo"
+                           string="Delivery"/>
+                </button>
+
+                <button name="action_view_invoice"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-file-text">
+
+                    <field name="invoice_count"
+                           widget="statinfo"
+                           string="Invoice"/>
+                </button>
+
+            </header>
 
             <sheet>
 
-                <group string="Book Information">
-                    <field name="name"/>
-                    <field name="author"/>
-                    <field name="published_date"/>
-                    <field name="description"/>
-                    <field name="customer_id"/>
+                <group>
+                    <group>
+                        <field name="name" required="1"/>
+                        <field name="author" required="1"/>
+                        <field name="published_date" required="1"/>
+                    </group>
+
+                    <group>
+                        <field name="customer_id"/>
+                        <field name="availability" readonly="1"/>
+                    </group>
                 </group>
 
                 <group string="Product Information">
-                    <field name="product_id"/>
+                    <field name="product_id" required="1"/>
                     <field name="quantity"/>
                     <field name="price_unit" readonly="1"/>
                 </group>
 
-                <group string="Status">
-                    <field name="state"/>
-                     <field name="availability" readonly="1"/>
-                   
+                <group string="Description">
+                    <field name="description"/>
                 </group>
-
-              
 
             </sheet>
 
@@ -74,22 +122,20 @@
 
     </field>
 </record>
+
 <record id="book_action" model="ir.actions.act_window">
-        <field name="name">Books</field>
-        <field name="res_model">library.book</field>
-        <field name="view_mode">tree,form</field>
+    <field name="name">Books</field>
+    <field name="res_model">library.book</field>
+    <field name="view_mode">tree,form</field>
+    <field name="search_view_id" ref="book_search_view"/>
+</record>
 
-    </record>
+<menuitem
+    id="book_menu_item"
+    name="Books"
+    parent="library_management_menu"
+    action="book_action"/>
 
+</data>
 
-    <menuitem
-        id="book_menu_item"
-        name="Books"
-        parent="library_management_menu"
-        action="book_action"/>
-
-
- 
-   </data>
-   
 </odoo>
