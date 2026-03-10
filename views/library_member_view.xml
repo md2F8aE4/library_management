@@ -1,0 +1,69 @@
+<odoo>
+    <data>
+
+        <record id="library_member_tree_view" model="ir.ui.view">
+            <field name="name">library.member.tree</field>
+            <field name="model">library.member</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="member_code" />
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="email"/>
+                    <field name="phone"/>
+                    <field name="membership_date"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="library_member_form_view" model="ir.ui.view">
+    <field name="name">library.member.form</field>
+    <field name="model">library.member</field>
+    <field name="arch" type="xml">
+        <form>
+            <sheet>
+            <field name="borrow_count" widget="statinfo" />
+           <button name="action_view_borrowing_history"
+                   type="object"
+                string="Borrowing History"
+                 class="oe_stat_button"
+                 icon="fa-book"/>
+                 <group string="Borrow Statistics">
+
+                    <field name="borrow_count"/>
+
+                    <field name="active_borrow_count"/>
+
+                          <field name="overdue_count"/>
+
+                </group>
+
+                <group>
+                    <field name="member_code" required="1"/>
+                    <field name="name" required="1"/>
+                    <field name="partner_id"/>
+                    <field name="email"/>
+                    <field name="phone"/>
+                    <field name="membership_date"/>
+                    <field name="active"/>
+                </group>
+
+                <group>
+                    <field name="notes"/>
+                </group>
+
+            </sheet>
+        </form>
+    </field>
+</record>
+<record id="library_member_action" model="ir.actions.act_window">
+    <field name="name">Members</field>
+    <field name="res_model">library.member</field>
+    <field name="view_mode">tree,form</field>
+</record>
+
+
+    </data>
+</odoo>

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+   <record id="borrow_book_tree_view" model="ir.ui.view">
+    <field name="name">borrow.book.tree</field>
+    <field name="model">borrow.book</field>
+    <field name="arch" type="xml">
+        <tree>
+            <field name="name"/>
+            <field name="member_id"/>
+            <field name="book_id"/>
+            <field name="borrow_date"/>
+            <field name="due_date"/>
+            <field name="return_date"/>
+            <field name="quantity"/>
+            <field name="state"/>
+        </tree>
+    </field>
+</record>
+
+<record id="borrow_book_form_view" model="ir.ui.view">
+    <field name="name">borrow.book.form</field>
+    <field name="model">borrow.book</field>
+    <field name="arch" type="xml">
+        <form string="Borrow Book">
+            <header>
+
+                <button name="action_set_draft"
+                        type="object"
+                        string="Set To Draft"
+                        class="btn-secondary"
+                        invisible="state == 'draft'"/>
+
+                <button name="action_set_borrowed"
+                        type="object"
+                        string="Set To Borrowed"
+                        class="btn-primary"
+                        invisible="state == 'borrowed'" />
+
+                <button name="action_set_returned"
+                        type="object"
+                        string="Set To Returned"
+                        class="btn-success"
+                        invisible="state == 'returned'"/>
+
+                <button name="action_set_overdue"
+                        type="object"
+                        string="Set To Overdue"
+                        class="btn-warning"
+                        invisible="state == 'overdue'"/>  
+
+                <button name="action_set_cancelled"
+                        type="object"
+                        string="Set To Cancelled"
+                        class="btn-danger"
+                        invisible="state == 'cancelled'"/>                                               
+
+                <field name="state" widget="statusbar"
+                       statusbar_visible="draft,borrowed,returned,overdue,cancelled"/>
+
+                 <button name="action_view_delivery"
+                        type="object"
+                        string="Delivery Order"
+                        class="oe_stat_button"
+                        icon="fa-truck"/>
+            
+                <button name="action_view_return"
+                         type="object"
+                         string="Return Picking"
+                         class="oe_stat_button"
+                         icon="fa-undo"/>
+            
+                <button name="action_view_invoice"
+                        type="object"
+                        string="Invoice"
+                        class="oe_stat_button"
+                        icon="fa-file-invoice"/>
+
+            </header>
+
+            <sheet>
+                <group>
+                    <field name="name"/>
+                    <field name="member_id" required="1"/>
+                    <field name="book_id" required="1"/>
+                </group>
+
+                <group>
+                    <field name="borrow_date"/>
+                    <field name="due_date" required="1"/>
+                    <field name="return_date"/>
+                    <field name="quantity"/>
+                    <field name="state"/>
+                </group>
+
+                <group string="Late Information">
+                    <field name="late_days" readonly="1"/>
+                    <field name="fine_amount" readonly="1"/>
+                    <field name="daily_fine" readonly="1"/>
+                </group>
+
+                <group string="Related Documents">
+                    <field name="invoice_id"/>
+                    <field name="delivery_id"/>
+                    <field name="return_picking_id"/>
+                </group>
+
+            </sheet>
+        </form>
+    </field>
+</record>
+
+<record id="borrow_book_action" model="ir.actions.act_window">
+    <field name="name">Borrow Books</field>
+    <field name="res_model">borrow.book</field>
+    <field name="view_mode">tree,form</field>
+</record>
+
+
+<record id="borrow_book_search_view" model="ir.ui.view">
+    <field name="name">borrow.book.search</field>
+    <field name="model">borrow.book</field>
+    <field name="arch" type="xml">
+
+        <search>
+
+            <filter string="Draft"
+                    name="draft"
+                    domain="[('state','=','draft')]"/>
+
+            <filter string="Borrowed"
+                    name="borrowed"
+                    domain="[('state','=','borrowed')]"/>
+
+            <filter string="Returned"
+                    name="returned"
+                    domain="[('state','=','returned')]"/>
+
+            <filter string="Overdue"
+                    name="overdue"
+                    domain="[('state','=','overdue')]"/>
+
+            <filter string="Cancelled"
+                    name="cancelled"
+                    domain="[('state','=','cancelled')]"/>
+
+            <separator/>
+
+            <filter string="Due Today"
+                    name="due_today"
+                    domain="[('due_date','=',context_today())]"/>
+
+            <filter string="Late Returns"
+                    name="late_returns"
+                    domain="[('due_date','&lt;',context_today()),('state','=','borrowed')]"/>
+
+            <separator/>
+
+            <group expand="0" string="Group By">
+
+                <filter string="Member"
+                        name="group_by_member"
+                        context="{'group_by':'member_id'}"/>
+
+                <filter string="Book"
+                        name="group_by_book"
+                        context="{'group_by':'book_id'}"/>
+
+                <filter string="State"
+                        name="group_by_state"
+                        context="{'group_by':'state'}"/>
+
+                <filter string="Borrow Date"
+                        name="group_by_borrow_date"
+                        context="{'group_by':'borrow_date'}"/>
+
+                <filter string="Due Date"
+                        name="group_by_due_date"
+                        context="{'group_by':'due_date'}"/>
+
+            </group>
+
+        </search>
+
+    </field>
+</record>
+
+  </data>
+</odoo>

@@ -40,12 +40,12 @@
     <field name="arch" type="xml">
 
         <form string="Book">
-
+        
             <header>
 
                 <field name="invoice_id" invisible="1"/>
                 <field name="delivery_id" invisible="1"/>
-
+        
                 <button name="action_borrow"
                         type="object"
                         string="Borrow"
@@ -69,29 +69,34 @@
                        widget="statusbar"
                        statusbar_visible="available,borrowed,returned"/>
 
-                <button name="action_view_delivery"
-                        type="object"
-                        class="oe_stat_button"
-                        icon="fa-truck">
-
-                    <field name="delivery_count"
-                           widget="statinfo"
-                           string="Delivery"/>
-                </button>
-
-                <button name="action_view_invoice"
-                        type="object"
-                        class="oe_stat_button"
-                        icon="fa-file-text">
-
-                    <field name="invoice_count"
-                           widget="statinfo"
-                           string="Invoice"/>
-                </button>
+               
 
             </header>
 
             <sheet>
+            <field name="borrow_count" widget="statinfo" />
+               <button name="action_view_borrow_history"
+                       type="object"
+                       string="Borrow History"
+                       class="oe_stat_button"
+                        icon="fa-book"/>
+             <div name = 'button_box' >
+            <button class="oe_stat_button"
+                type="object"
+                icon="fa-file-text-o"
+                name="action_view_customer_invoices">
+                <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                </button>
+                 </div> 
+                 <group string="Borrow Information">
+
+                      <field name="availability"/>
+
+                       <field name="current_borrower_id"/>
+
+                         <field name="borrow_count"/>
+
+                 </group>
 
                 <group>
                     <group>
@@ -117,9 +122,14 @@
                 </group>
 
             </sheet>
+            <div class ="oe_chatter">
+            <field name = "message_follower_ids" widget="mail_followers"/>
+             <field name = "activity_ids" widget="mail_activity"/>
+              <field name = "message_ids" widget="mail_thread"/>
+              </div>
 
         </form>
-
+        
     </field>
 </record>
 
@@ -130,11 +140,6 @@
     <field name="search_view_id" ref="book_search_view"/>
 </record>
 
-<menuitem
-    id="book_menu_item"
-    name="Books"
-    parent="library_management_menu"
-    action="book_action"/>
 
 </data>
 

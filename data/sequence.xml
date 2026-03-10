@@ -1,0 +1,23 @@
+<odoo>
+    <data>
+
+
+        <record id="member_sequence" model="ir.sequence">
+            <field name="name">member Sequence</field>
+            <field name="code">member_sequence</field>
+            <field name="prefix">mem</field>
+            <field name="padding">5</field>
+        </record>
+
+
+        <record id="name_sequence" model="ir.sequence">
+            <field name="name">name Sequence</field>
+            <field name="code">name_sequence</field>
+            <field name="prefix">nem</field>
+            <field name="padding">5</field>
+        </record>
+
+
+
+    </data>
+</odoo>

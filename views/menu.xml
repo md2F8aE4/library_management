@@ -1,17 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <menuitem id="book_menu"
+              name="Library"/>
 
-     <menuitem
-        id="book_menu"
-        name="Library"
-       
-    />
 
-     <menuitem
-        id="library_management_menu"
-        name="Library Management"
-        parent="book_menu"
+    <menuitem
+              id="book_menu_item"
+              name="Books"
+              parent="book_menu"
+              action="book_action"/>
+
+
+    <menuitem id="library_management_menu"
+              name="Library Management"
+              parent="book_menu"/>
+
+    <menuitem id="library_member_menu"
+              name="Members"
+              parent="book_menu"
+              action="library_member_action"/>
+
+    <menuitem
+              id="borrow_book_menu"
+              name="Borrow Books"
+              parent="book_menu"
+              action="borrow_book_action"
     />
 
 </odoo>

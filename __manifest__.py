@@ -2,10 +2,13 @@
     'name': 'Library Management',
     'version': '1.0',
     'author': 'Abdelrahman',
-    'depends': ['base', 'stock', 'product', 'account'],
+    'depends': ['base', 'stock', 'product', 'account','mail'],
     "data": [
         "security/ir.model.access.csv",
+        'data/sequence.xml',
         "views/book_view.xml",
+        "views/library_member_view.xml",
+        'views/borrow_book_views.xml',
         "views/menu.xml",
         
     ],

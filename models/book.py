@@ -5,10 +5,11 @@ from odoo.exceptions import ValidationError
 class Book(models.Model):
     _name = 'library.book'
     _description = 'Book'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string='Book Name')
-    author = fields.Char(string='Author Name')
-    published_date = fields.Date(string='Published Date')
+    name = fields.Char(string='Book Name',tracking=True)
+    author = fields.Char(string='Author Name',tracking=True)
+    published_date = fields.Date(string='Published Date',tracking=True)
     description = fields.Text(string='Description')
     product_id = fields.Many2one('product.product', string='Related Product', domain=[('detailed_type', '=', 'product')])
     quantity = fields.Float(string='Quantity', default=1)
@@ -19,13 +20,44 @@ class Book(models.Model):
     delivery_id = fields.Many2one('stock.picking')
     invoice_id = fields.Many2one('account.move')
     delivery_count = fields.Integer(compute="_compute_counts", store=True)
-    invoice_count = fields.Integer(compute="_compute_counts", store=True)
+    invoice_count = fields.Integer(compute="_compute_invoice_count", store=True)
+    
+    borrow_count = fields.Integer( compute='_compute_borrow_count', store=True)
+    
+    current_borrower_id = fields.Many2one('library.member', string="Current Borrower",compute="_compute_current_borrower")
 
-    @api.depends('delivery_id', 'invoice_id')
-    def _compute_counts(self):
-        for record in self:
-            record.delivery_count = 1 if record.delivery_id else 0
-            record.invoice_count = 1 if record.invoice_id else 0
+    @api.depends()
+    def _compute_current_borrower(self):
+        for rec in self:
+            borrow = self.env['borrow.book'].search([
+                ('book_id', '=', rec.id),
+                ('state', '=', 'borrowed')
+            ], limit=1)
+
+            rec.current_borrower_id = borrow.member_id
+
+
+    def _compute_borrow_count(self):
+        for book in self:
+            book.borrow_count = self.env['borrow.book'].search_count([('book_id', '=', book.id)])
+
+    def action_view_borrow_history(self):
+        self.ensure_one()
+        return {
+            'name': 'Borrow History',
+            'type': 'ir.actions.act_window',
+            'res_model': 'borrow.book',
+            'view_mode': 'tree,form',
+            'domain': [('book_id', '=', self.id)],
+            'target': 'current',
+        }
+   
+   
+    def _compute_invoice_count(self):
+     for record in self:
+        record.invoice_count = self.env['account.move'].search_count([
+            ('partner_id', '=', record.customer_id.id)
+        ])
 
     @api.depends('product_id', 'quantity')
     def _compute_availability(self):
@@ -78,44 +110,20 @@ class Book(models.Model):
         picking.action_confirm()
         picking.button_validate()
 
-        invoice = self.env['account.move'].create({
-            'move_type': 'out_invoice',
-            'partner_id': self.customer_id.id,
-            'invoice_line_ids': [(0, 0, {
-                'product_id': self.product_id.id,
-                'quantity': self.quantity,
-                'price_unit': self.price_unit,
-            })]
-        })
+      
 
-        invoice.action_post()
-        self.delivery_id = picking.id
-        self.invoice_id = invoice.id
-        self.state = 'borrowed'
-
-    def action_view_delivery(self):
-        self.ensure_one()
-        if not self.delivery_id:
-            raise ValidationError("No delivery found.")
+    def action_view_customer_invoices(self):
+        self.ensure_one() 
         return {
+            'name': 'Customer Invoices',
             'type': 'ir.actions.act_window',
-            'name': 'Delivery',
-            'res_model': 'stock.picking',
-            'view_mode': 'form',
-            'res_id': self.delivery_id.id
-        }
+            'res_model': 'account.move', 
+            'view_mode': 'form',    
+            'domain': [('partner_id', '=', self.customer_id.id)], 
+            'context': {'default_move_type': 'out_invoice', 'default_partner_id': self.customer_id.id},
+                    
+        }   
 
-    def action_view_invoice(self):
-        self.ensure_one()
-        if not self.invoice_id:
-            raise ValidationError("No invoice found.")
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Invoice',
-            'res_model': 'account.move',
-            'view_mode': 'form',
-            'res_id': self.invoice_id.id
-        }
 
     def action_set_available(self):
         self.state = 'available'
@@ -125,3 +133,4 @@ class Book(models.Model):
 
     def action_set_returned(self):
         self.state = 'returned'
+
