@@ -6,6 +6,7 @@
     "data": [
         "security/ir.model.access.csv",
         'data/sequence.xml',
+        'views/borrow_book_wizard_views.xml',
         "views/book_view.xml",
         "views/library_member_view.xml",
         'views/borrow_book_views.xml',

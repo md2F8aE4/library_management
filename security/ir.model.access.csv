@@ -3,3 +3,4 @@ access_library_book,access_library_book,model_library_book,,1,1,1,1
 access_library_book_manager,library_book_manager,model_library_book,,1,1,1,1
 access_library_member,access_library_member,model_library_member,,1,1,1,1
 access_borrow_book,access_borrow_book,model_borrow_book,,1,1,1,1
+access_borrow_book_wizard,access_borrow_book_wizard,model_borrow_book_wizard,,1,1,1,1

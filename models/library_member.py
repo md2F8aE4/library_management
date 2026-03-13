@@ -7,12 +7,12 @@ class LibraryMember(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(string='Member')
-    member_code = fields.Char(string='Member Code', default='New', copy=False, readonly=True)
-    partner_id = fields.Many2one('res.partner')
     email = fields.Char(string='Email')
     phone = fields.Char(string='Phone No')
-    membership_date = fields.Date(string='Member Date')
-    active = fields.Boolean(default=True)
+    member_code = fields.Char(string='Member Code', default='New', copy=False, readonly=True)
+    partner_id = fields.Many2one('res.partner')
+    membership_date = fields.Date(string='Date')
+    active = fields.Boolean(default=True, )
     notes = fields.Text()
     borrow_count = fields.Integer( compute='_compute_borrow_count')
     active_borrow_count = fields.Integer(
@@ -24,6 +24,7 @@ class LibraryMember(models.Model):
         string="Overdue Books",
         compute="_compute_borrow_stats"
     )
+
 
     @api.depends()
     def _compute_borrow_stats(self):
@@ -63,4 +64,17 @@ class LibraryMember(models.Model):
         for vals in vals_list:
             if not vals.get('member_code') or vals.get('member_code') == 'New':
                 vals['member_code'] = self.env['ir.sequence'].next_by_code('member_sequence') or 'New'
+            partner_id = vals.get('partner_id')
+            if partner_id and not (vals.get('name') or vals.get('email') or vals.get('phone')):
+                partner = self.env['res.partner'].browse(partner_id)
+                vals.setdefault('name', partner.name)
+                vals.setdefault('email', partner.email)
+                vals.setdefault('phone', partner.phone)
         return super().create(vals_list)
+
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        if self.partner_id:
+            self.name = self.partner_id.name or False
+            self.email = self.partner_id.email or False
+            self.phone = self.partner_id.phone or False

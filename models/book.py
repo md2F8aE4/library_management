@@ -54,10 +54,10 @@ class Book(models.Model):
    
    
     def _compute_invoice_count(self):
-     for record in self:
-        record.invoice_count = self.env['account.move'].search_count([
-            ('partner_id', '=', record.customer_id.id)
-        ])
+        for record in self:
+            record.invoice_count = self.env['account.move'].search_count([
+                ('partner_id', '=', record.customer_id.id)
+            ])
 
     @api.depends('product_id', 'quantity')
     def _compute_availability(self):
@@ -134,3 +134,13 @@ class Book(models.Model):
     def action_set_returned(self):
         self.state = 'returned'
 
+    def action_open_borrow_wizard(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Borrow Book',
+            'res_model': 'borrow.book.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_book_id': self.id}
+        }

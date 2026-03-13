@@ -3,6 +3,14 @@
 
 <data>
 
+<record id="action_borrow_book_wizard" model="ir.actions.act_window">
+    <field name="name">Borrow Book</field>
+    <field name="res_model">borrow.book.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+    <field name="context">{'default_book_id': active_id}</field>
+</record>
+
 <record id="book_search_view" model="ir.ui.view">
     <field name="name">book.search.view</field>
     <field name="model">library.book</field>
@@ -69,32 +77,41 @@
                        widget="statusbar"
                        statusbar_visible="available,borrowed,returned"/>
 
+                <button name="%(action_borrow_book_wizard)d"
+                        type="action"
+                        string="Borrow"/>
+
+                      
                
 
             </header>
 
             <sheet>
-            <field name="borrow_count" widget="statinfo" />
-               <button name="action_view_borrow_history"
-                       type="object"
-                       string="Borrow History"
-                       class="oe_stat_button"
-                        icon="fa-book"/>
-             <div name = 'button_box' >
-            <button class="oe_stat_button"
-                type="object"
-                icon="fa-file-text-o"
-                name="action_view_customer_invoices">
-                <field name="invoice_count" widget="statinfo" string="Invoices"/>
-                </button>
-                 </div> 
+            <widget name="web_ribbon"
+               title="Out of Stock"
+               bg_color="bg-danger"
+               invisible="availability != 'Out of Stock'"/>
+
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_borrow_history"
+                            type="object"
+                            string="Borrow History"
+                            class="oe_stat_button"
+                            icon="fa-book">
+                        <field name="borrow_count" widget="statinfo"/>
+                    </button>
+                    <button class="oe_stat_button"
+                            type="object"
+                            icon="fa-file-text-o"
+                            name="action_view_customer_invoices">
+                        <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                    </button>
+                </div>
                  <group string="Borrow Information">
 
-                      <field name="availability"/>
+                    
 
-                       <field name="current_borrower_id"/>
-
-                         <field name="borrow_count"/>
+                       
 
                  </group>
 
@@ -108,6 +125,9 @@
                     <group>
                         <field name="customer_id"/>
                         <field name="availability" readonly="1"/>
+                        <field name="current_borrower_id"/>
+
+                         <field name="borrow_count"/>
                     </group>
                 </group>
 

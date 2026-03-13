@@ -50,7 +50,7 @@ class borrowbook(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if not vals.get('name') or vals.get('name') == 'New':
-                vals['name'] = self.env['ir.sequence'].next_by_code('name_sequence') or 'New'
+                vals['name'] = self.env['ir.sequence'].next_by_code('borrow_sequence') or 'New'
         return super().create(vals_list)
 
     def action_set_draft(self):
