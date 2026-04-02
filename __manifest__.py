@@ -11,6 +11,7 @@
         "views/library_member_view.xml",
         'views/borrow_book_views.xml',
         "views/menu.xml",
+        'views/portal_templates.xml',
         
     ],
 
