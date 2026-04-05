@@ -1,74 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <template id="portal_my_books" name="My Books">
+
+    <template id="portal_my_books" name="Borrow book">
         <t t-call="portal.portal_layout">
-
             <div class="container mt-4">
-                <h2 class="mb-4">📚 My Books</h2>
-
+                <h2 class="mb-4">📚 Borrow book</h2>
                 <div class="row">
                     <t t-foreach="books" t-as="book">
-
                         <div class="col-md-4 mb-3">
                             <div class="card shadow-sm h-100">
-
                                 <div class="card-body">
-
                                     <h5 class="card-title" t-esc="book.name"/>
-
                                     <p class="card-text">
                                         <strong>Author:</strong>
                                         <span t-esc="book.author or 'N/A'"/>
                                     </p>
-
                                     <p>
                                         <strong>Status:</strong>
                                         <span t-esc="book.state"/>
                                     </p>
 
-                                   <t t-if="book.state == 'available'">
-                                     <a t-att-href="'/my/book/borrow/%s' % book.id"
-                                        class="btn btn-success btn-sm"
-                                        onclick="return confirm('Are you sure you want to borrow ?')">
-                                                    Borrow
-                                              </a>
-                                      </t>
+
+                                    <t t-if="book.state == 'available'">
+                                        <a t-att-href="'/my/book/borrow/%s' % book.id"
+                                           class="btn btn-success btn-sm"
+                                           onclick="return confirm('Are you sure you want to borrow?')">
+                                           Borrow
+                                        </a>
+                                    </t>
+
 
                                     <t t-if="book.state != 'available'">
-                                       <a t-att-href="'/my/book/return/%s' % book.id"
-                                          class="btn btn-warning btn-sm"
-                                      onclick="return confirm('Are you sure you want to return this book?')">
-                                           Return 
-                                          </a>
-                                           </t>
+                                        <a t-att-href="'/my/book/return/%s' % book.id"
+                                           class="btn btn-warning btn-sm"
+                                           onclick="return confirm('Are you sure you want to return this book?')">
+                                           Return
+                                        </a>
+                                    </t>
 
                                 </div>
-
                             </div>
                         </div>
-
                     </t>
                 </div>
-
             </div>
-
         </t>
     </template>
 
 
-    <template id="portal_my_books_link" inherit_id="portal.portal_my_home">
-
-        <xpath expr="//div[hasclass('o_portal_my_home')]" position="inside">
-
-            <div class="o_portal_my_doc">
-                <a href="/my/books" class="btn btn-primary">
-                    📚 My Books
-                </a>
-            </div>
-
+    <template id="portal_my_books_link" name="Show Borrow Books" customize_show="True" inherit_id="portal.portal_my_home" priority="50">
+        <xpath expr="//div[@id='portal_common_category']" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="config_card" t-value="True"/>
+                <t t-set="icon" t-value="'/library_management/static/src/img/book.png'"/>
+                <t t-set="title">Borrow Books</t>
+                <t t-set="url" t-value="'/my/books'"/>
+                <t t-set="text">Browse available books and borrow what you need</t>
+            </t>
         </xpath>
+    </template>
 
+
+    <template id="portal_my_borrowed_books" name="My Borrowed Books">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4">
+                <h2 class="mb-4">📚 My Borrowed Books</h2>
+                
+                <t t-if="not books">
+                    <p>You have no borrowed books.</p>
+                </t>
+
+                <div class="row">
+                    <t t-foreach="books" t-as="book">
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title" t-esc="book.name"/>
+                                    <p class="card-text">
+                                        <strong>Author:</strong> <span t-esc="book.author or 'N/A'"/>
+                                    </p>
+                                    <p>
+                                        <strong>Status:</strong> <span t-esc="book.state"/>
+                                    </p>
+
+                                    <a t-att-href="'/my/book/return/%s' % book.id"
+                                       class="btn btn-warning btn-sm"
+                                       onclick="return confirm('Are you sure you want to return this book?')">
+                                       Return
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
     </template>
 
 </odoo>
