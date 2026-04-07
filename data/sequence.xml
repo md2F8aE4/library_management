@@ -11,9 +11,9 @@
 
 
         <record id="borrow_sequence" model="ir.sequence">
-            <field name="name">borrow_sequencee</field>
+            <field name="name">Borrow Sequence</field>
             <field name="code">borrow_sequence</field>
-            <field name="prefix">NEM-</field>
+            <field name="prefix">BOR-</field>
             <field name="padding">5</field>
         </record>
 

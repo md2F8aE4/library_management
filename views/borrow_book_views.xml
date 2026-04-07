@@ -105,7 +105,6 @@
     <group string="Late Information">
         <group>
             <field name="late_days" readonly="1"/>
-            <field name="daily_fine" readonly="1"/>
         </group>
 
         <group>

@@ -1,6 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_library_book,access_library_book,model_library_book,,1,1,1,1
-access_library_book_manager,library_book_manager,model_library_book,,1,1,1,1
-access_library_member,access_library_member,model_library_member,,1,1,1,1
-access_borrow_book,access_borrow_book,model_borrow_book,,1,1,1,1
-access_borrow_book_wizard,access_borrow_book_wizard,model_borrow_book_wizard,,1,1,1,1
+access_book_user,book_user,model_library_book,group_library_user,1,0,0,0
+access_book_manager,book_manager,model_library_book,group_library_manager,1,1,1,1
+access_member_user,member_user,model_library_member,group_library_user,1,0,0,0
+access_member_manager,member_manager,model_library_member,group_library_manager,1,1,1,1
+access_borrow_user,borrow_user,model_borrow_book,group_library_user,1,1,1,0
+access_borrow_manager,borrow_manager,model_borrow_book,group_library_manager,1,1,1,1
+access_wizard,wizard,model_borrow_book_wizard,group_library_user,1,1,1,1

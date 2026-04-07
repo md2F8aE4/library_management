@@ -14,19 +14,28 @@ class Book(models.Model):
     product_id = fields.Many2one('product.product', string='Related Product', domain=[('detailed_type', '=', 'product')])
     quantity = fields.Float(string='Quantity', default=1)
     price_unit = fields.Float(string='Unit Price', related='product_id.list_price', store=True)
-    state = fields.Selection([('available', 'Available'), ('borrowed', 'Borrowed'), ('returned', 'Returned')], default='available')
+    state = fields.Selection(
+        [
+            ('available', 'Available'),
+            ('borrowed', 'Borrowed'),
+            ('out_of_stock', 'Out of Stock'),
+        ],
+        compute='_compute_state',
+        store=True,
+        string='Status',
+    )
     customer_id = fields.Many2one('res.partner', string='Customer')
     availability = fields.Char(compute="_compute_availability", store=True)
     delivery_id = fields.Many2one('stock.picking')
     invoice_id = fields.Many2one('account.move')
     delivery_count = fields.Integer(compute="_compute_counts", store=True)
     invoice_count = fields.Integer(compute="_compute_invoice_count", store=True)
-    
+    borrow_ids = fields.One2many('borrow.book', 'book_id', string='Borrow Records')
     borrow_count = fields.Integer( compute='_compute_borrow_count', store=True)
     
     current_borrower_id = fields.Many2one('library.member', string="Current Borrower",compute="_compute_current_borrower")
 
-    @api.depends()
+    @api.depends('borrow_ids.state')
     def _compute_current_borrower(self):
         for rec in self:
             borrow = self.env['borrow.book'].search([
@@ -36,7 +45,7 @@ class Book(models.Model):
 
             rec.current_borrower_id = borrow.member_id
 
-
+    @api.depends('borrow_ids')
     def _compute_borrow_count(self):
         for book in self:
             book.borrow_count = self.env['borrow.book'].search_count([('book_id', '=', book.id)])
@@ -53,11 +62,10 @@ class Book(models.Model):
         }
    
    
+    @api.depends('invoice_id')
     def _compute_invoice_count(self):
         for record in self:
-            record.invoice_count = self.env['account.move'].search_count([
-                ('partner_id', '=', record.customer_id.id)
-            ])
+            record.invoice_count = 1 if record.invoice_id else 0
 
     @api.depends('product_id', 'quantity')
     def _compute_availability(self):
@@ -66,6 +74,19 @@ class Book(models.Model):
                 record.availability = "Available"
             else:
                 record.availability = "Out of Stock"
+
+    @api.depends('borrow_ids.state', 'product_id.qty_available', 'quantity')
+    def _compute_state(self):
+        for book in self:
+            active_borrows = book.borrow_ids.filtered(
+                lambda b: b.state in ('borrowed', 'overdue')
+            )
+            if active_borrows:
+                book.state = 'borrowed'
+            elif book.product_id and book.product_id.qty_available <= 0:
+                book.state = 'out_of_stock'
+            else:
+                book.state = 'available'
 
     @api.constrains('product_id', 'quantity')
     def _check_quantity_rules(self):
@@ -124,15 +145,6 @@ class Book(models.Model):
                     
         }   
 
-
-    def action_set_available(self):
-        self.state = 'available'
-
-    def action_set_borrowed(self):
-        self.state = 'borrowed'
-
-    def action_set_returned(self):
-        self.state = 'returned'
 
     def action_open_borrow_wizard(self):
         self.ensure_one()

@@ -4,6 +4,7 @@
     'author': 'Abdelrahman',
     'depends': ['base', 'stock', 'product', 'account', 'mail', 'portal', 'sale'],
     "data": [
+        "security/groups.xml",
         "security/ir.model.access.csv",
         'data/sequence.xml',
         'views/borrow_book_wizard_views.xml',

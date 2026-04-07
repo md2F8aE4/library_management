@@ -1,8 +1,15 @@
+import bisect
 from odoo import fields , models,api
 from datetime import date
 from odoo.exceptions import ValidationError
 
-class borrowbook(models.Model):
+FINE_TIERS = [
+    (3, 1.0),   
+    (7, 2.0),   
+    (999, 5.0), 
+]
+
+class BorrowBook(models.Model):
     _name= "borrow.book"
     _description = 'Library Borrow Transaction'
     _inherit=['mail.thread','mail.activity.mixin']
@@ -29,7 +36,6 @@ class borrowbook(models.Model):
     invoice_id= fields.Many2one('account.move')
     delivery_id= fields.Many2one('stock.picking')
     return_picking_id= fields.Many2one('stock.picking')
-    daily_fine=fields.Float(string='daily fine',default=5) 
     
    
     @api.depends('due_date', 'return_date')
@@ -41,10 +47,18 @@ class borrowbook(models.Model):
             else:
                 record.late_days = 0
 
-    @api.depends('late_days','daily_fine')
+    @api.depends('late_days')
     def _compute_fine(self):
+        thresholds = [t[0] for t in FINE_TIERS]
+        rates = [t[1] for t in FINE_TIERS]
         for record in self:
-            record.fine_amount = record.late_days * record.daily_fine
+            if record.late_days <= 0:
+                record.fine_amount = 0.0
+            else:
+                idx = bisect.bisect_left(thresholds, record.late_days)
+                idx = min(idx, len(rates) - 1)
+                rate = rates[idx]
+                record.fine_amount = record.late_days * rate
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -82,7 +96,17 @@ class borrowbook(models.Model):
              'picking_type_id': self.env.ref('stock.picking_type_out').id,
              'location_id': self.env.ref('stock.stock_location_stock').id,
              'location_dest_id': rec.member_id.partner_id.property_stock_customer.id,
-})
+             'move_ids_without_package': [(0, 0, {
+                 'product_id': rec.book_id.product_id.id,
+                 'product_uom_qty': rec.quantity,
+                 'product_uom': rec.book_id.product_id.uom_id.id,
+                 'name': rec.book_id.product_id.name,
+                 'location_id': self.env.ref('stock.stock_location_stock').id,
+                 'location_dest_id': rec.member_id.partner_id.property_stock_customer.id,
+             })],
+ })
+            picking.action_confirm()
+            picking.button_validate()
 
             rec.delivery_id = picking.id
             rec.state = 'borrowed'
@@ -103,10 +127,18 @@ class borrowbook(models.Model):
                 'picking_type_id': self.env.ref('stock.picking_type_in').id,
                 'location_id': self.env.ref('stock.stock_location_customers').id,
                 'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+                'move_ids_without_package': [(0, 0, {
+                    'product_id': rec.book_id.product_id.id,
+                    'product_uom_qty': rec.quantity,
+                    'product_uom': rec.book_id.product_id.uom_id.id,
+                    'name': rec.book_id.product_id.name,
+                    'location_id': self.env.ref('stock.stock_location_customers').id,
+                    'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+                })]
             })
-
+            picking.action_confirm()
+            picking.button_validate()
             rec.return_picking_id = picking.id
-            rec.state = 'returned'
 
     def action_set_overdue(self):
         self.state = 'overdue'
@@ -158,3 +190,4 @@ class borrowbook(models.Model):
             'res_id': self.invoice_id.id,
             'target': 'current',
         }    
+    

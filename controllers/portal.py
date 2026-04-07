@@ -1,6 +1,9 @@
 from odoo import http
 from odoo.http import request
 from odoo.addons.portal.controllers.portal import CustomerPortal
+from odoo import fields
+from odoo.exceptions import ValidationError
+from datetime import timedelta
 
 class LibraryPortal(http.Controller):
 
@@ -33,15 +36,16 @@ class LibraryPortal(http.Controller):
         if not member or book.state != 'available':
             return request.redirect('/my/books')
 
-        request.env['borrow.book'].sudo().create({
+        borrow = request.env['borrow.book'].sudo().create({
             'book_id': book.id,
             'member_id': member.id,
-            'state': 'borrowed'
+            'due_date': fields.Date.today() + timedelta(days=14),
         })
-        book.sudo().write({
-            'state': 'borrowed'
-        })
-
+        try:
+            borrow.action_set_borrowed()
+        except ValidationError:
+            borrow.unlink()
+            return request.redirect('/my/books?error=unavailable')
         return request.redirect('/my/books')
     
 

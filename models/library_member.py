@@ -15,6 +15,7 @@ class LibraryMember(models.Model):
     active = fields.Boolean(default=True, )
     notes = fields.Text()
     borrow_count = fields.Integer( compute='_compute_borrow_count')
+    borrow_ids = fields.One2many('borrow.book', 'member_id', string='Borrow Records')
     active_borrow_count = fields.Integer(
         string="Active Borrowed Books",
         compute="_compute_borrow_stats"
@@ -26,7 +27,7 @@ class LibraryMember(models.Model):
     )
 
 
-    @api.depends()
+    @api.depends('borrow_ids.state')
     def _compute_borrow_stats(self):
         for rec in self:
 
@@ -42,7 +43,7 @@ class LibraryMember(models.Model):
 
             rec.active_borrow_count = active
             rec.overdue_count = overdue
-            
+    @api.depends('borrow_ids')        
     def _compute_borrow_count(self):
         for member in self:
             member.borrow_count=self.env['borrow.book'].search_count([('member_id', '=', member.id)])

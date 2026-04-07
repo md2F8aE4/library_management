@@ -54,32 +54,14 @@
                 <field name="invoice_id" invisible="1"/>
                 <field name="delivery_id" invisible="1"/>
         
-                <button name="action_borrow"
-                        type="object"
-                        string="Borrow"
-                        class="oe_highlight"
-                        invisible="state != 'available'"/>
-
-                <button name="action_set_available"
-                        type="object"
-                        string="Set To Available"/>
-
-                <button name="action_set_borrowed"
-                        type="object"
-                        string="Set To Borrowed"
-                        invisible="1"/>
-
-                <button name="action_set_returned"
-                        type="object"
-                        string="Set To Returned"/>
-
                 <field name="state"
                        widget="statusbar"
-                       statusbar_visible="available,borrowed,returned"/>
+                       statusbar_visible="available,borrowed,out_of_stock"/>
 
                 <button name="%(action_borrow_book_wizard)d"
                         type="action"
-                        string="Borrow"/>
+                        string="Borrow"
+                        invisible="state != 'available'"/>
 
                       
                
