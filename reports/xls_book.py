@@ -16,7 +16,7 @@ class BookReport(models.Model):
 
     def action_export_excel(self):
         if not self:
-            raise UserError("من فضلك اختار كتاب واحد على الأقل")
+            raise UserError('No records to export.')
 
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
