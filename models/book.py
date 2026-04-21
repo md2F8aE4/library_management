@@ -156,3 +156,11 @@ class Book(models.Model):
             'target': 'new',
             'context': {'default_book_id': self.id}
         }
+
+    def action_print_excel_report(self):
+        book_ids = self.ids
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/library/book/excel/report/{book_ids}',
+            'target': 'new',
+        }

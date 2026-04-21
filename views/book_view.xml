@@ -63,6 +63,10 @@
                         string="Borrow"
                         invisible="state != 'available'"/>
 
+                <button name="%(book_xlsx_report_action)d"
+                        type="action"
+                        string="Print Excel Report"
+                        class="btn-primary"/>
                       
                
 

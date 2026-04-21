@@ -1,0 +1,221 @@
+<odoo>
+
+    
+    <record id="book_report_record" model="ir.actions.report">
+        <field name="name">Book Report</field>
+        <field name="model">library.book</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="binding_model_id" ref="model_library_book"/>
+        <field name="binding_type">report</field>
+        <field name="report_name">library_management.book_report_template</field>
+    </record>
+
+
+    
+    <record id="book_xlsx_report_action" model="ir.actions.server">
+        <field name="name">Book Excel Report</field>
+        <field name="model_id" ref="model_library_book"/>
+        <field name="binding_model_id" ref="model_library_book"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code">
+book_ids = records.ids or env.context.get('active_ids', [])
+action = {
+    'type': 'ir.actions.act_url',
+    'url': '/library/book/excel/report/%s' % ','.join(map(str, book_ids)),
+    'target': 'self',
+}
+        </field>
+    </record>
+
+
+    
+    <template id="book_report_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        color: #333;
+                        font-size: 13px;
+                    }
+
+                    .invoice-header {
+                        text-align: center;
+                        border-bottom: 2px solid #444;
+                        margin-bottom: 20px;
+                        padding-bottom: 10px;
+                    }
+
+                    .invoice-title {
+                        font-size: 22px;
+                        font-weight: bold;
+                        margin: 0;
+                    }
+
+                    .invoice-subtitle {
+                        font-size: 12px;
+                        color: #777;
+                    }
+
+                    .invoice-info {
+                        border: 1px solid #ddd;
+                        padding: 10px;
+                        margin-bottom: 20px;
+                    }
+
+                    .info-row {
+                        margin-bottom: 5px;
+                    }
+
+                    .info-label {
+                        font-weight: bold;
+                    }
+
+                    .simple-table table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+
+                    .simple-table th {
+                        background: #444;
+                        color: white;
+                        padding: 8px;
+                        font-size: 12px;
+                    }
+
+                    .simple-table td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        text-align: center;
+                    }
+
+                    .simple-table tr:nth-child(even) {
+                        background: #f9f9f9;
+                    }
+
+                    .status-available {
+                        color: green;
+                        font-weight: bold;
+                    }
+
+                    .status-borrowed {
+                        color: orange;
+                        font-weight: bold;
+                    }
+
+                    .status-out {
+                        color: red;
+                        font-weight: bold;
+                    }
+
+                    .invoice-footer {
+                        margin-top: 20px;
+                        border-top: 2px solid #444;
+                        padding-top: 10px;
+                        font-size: 12px;
+                    }
+
+                    .footer-left {
+                        float: left;
+                    }
+
+                    .footer-right {
+                        float: right;
+                        text-align: right;
+                    }
+
+                    .clearfix {
+                        clear: both;
+                    }
+                </style>
+
+                <t t-foreach="docs" t-as="book">
+                    <div class="page">
+
+                        
+                        <div class="invoice-header">
+                            <h1 class="invoice-title">Library Book Invoice</h1>
+                            <p class="invoice-subtitle">Book Inventory Report</p>
+                        </div>
+
+                        
+                        <div class="invoice-info">
+                            <div class="info-row">
+                                <span class="info-label">Report Date: </span>
+                                <span>
+                                    <t t-esc="datetime.datetime.now().strftime('%Y-%m-%d')"/>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Book Title: </span>
+                                <span t-field="book.name"/>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Author: </span>
+                                <span t-field="book.author"/>
+                            </div>
+                        </div>
+
+                        
+                        <div class="simple-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Published Date</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span t-field="book.published_date" t-options="{'widget': 'date'}"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="book.quantity"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="book.price_unit"/>
+                                        </td>
+                                        <td>
+                                            <t t-if="book.state == 'available'">
+                                                <span class="status-available">Available</span>
+                                            </t>
+                                            <t t-if="book.state == 'borrowed'">
+                                                <span class="status-borrowed">Borrowed</span>
+                                            </t>
+                                            <t t-if="book.state == 'out_of_stock'">
+                                                <span class="status-out">Out</span>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        
+                        <div class="invoice-footer">
+                            <div class="footer-left">
+                                Library Management System<br/>
+                                Generated:
+                                <t t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M')"/>
+                            </div>
+
+                            <div class="footer-right">
+                                Total Books: <t t-out="len(docs)"/>
+                            </div>
+
+                            <div class="clearfix"/>
+                        </div>
+
+                    </div>
+                </t>
+
+            </t>
+        </t>
+    </template>
+
+</odoo>
